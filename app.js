@@ -67,10 +67,11 @@ function init() {
 // ─── 班別時間設定變更 ─────────────────────────────────
 function onShiftTimeChange() {
   SHIFT_ORDER.forEach(key => {
-    shiftTimes[key] = {
-      start: document.getElementById(`t-${key}-start`).value,
-      end:   document.getElementById(`t-${key}-end`).value,
-    };
+    const startEl = document.getElementById(`t-${key}-start`);
+    const endEl   = document.getElementById(`t-${key}-end`);
+    if (startEl && endEl) {
+      shiftTimes[key] = { start: startEl.value, end: endEl.value };
+    }
   });
   renderAll();
 }
@@ -247,11 +248,15 @@ function generateSchedule() {
 
 function getDemand(isWeekend) {
   const suffix = isWeekend ? 'we' : 'wd';
+  const val = (id) => {
+    const el = document.getElementById(id);
+    return el ? (parseInt(el.value) || 0) : 0;
+  };
   return {
-    morning:   parseInt(document.getElementById(`d-morning-${suffix}`).value)   || 0,
-    afternoon: parseInt(document.getElementById(`d-afternoon-${suffix}`).value) || 0,
-    evening:   parseInt(document.getElementById(`d-evening-${suffix}`).value)   || 0,
-    night:     parseInt(document.getElementById(`d-night-${suffix}`).value)     || 0,
+    morning:   val(`d-morning-${suffix}`),
+    afternoon: val(`d-afternoon-${suffix}`),
+    evening:   val(`d-evening-${suffix}`),
+    night:     val(`d-night-${suffix}`),
   };
 }
 
