@@ -316,13 +316,4 @@ body { font-family: 'Noto Sans TC', system-ui, sans-serif; background: var(--c-b
   .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--c-border); }
   .main { padding: 12px; }
    
-/* ==========================================================================
-   方案 A：當天人力不足時，班表總覽的日期欄位反紅提醒
-   ========================================================================== */
-.date-shortage-cell {
-  background-color: #fee2e2 !important; /* 亮淺紅色背景 */
-  color: #dc2626 !important;           /* 深紅色文字 */
-  font-weight: bold !important;        /* 文字加粗 */
-  border: 1px solid #fca5a5 !important;/* 邊框微調為紅色系 */
-   
 }
