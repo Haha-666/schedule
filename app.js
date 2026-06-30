@@ -211,7 +211,7 @@ function generateSchedule() {
       );
 
       // 優先排「連續上班天數較多但未滿5天」的人，盡量撐滿人力以減少缺人；
-      // 工作天數少者優先（平衡），相同則連續天數少者優先
+      // 連續天數相同時，再用工作天數少者優先做平衡
       avail.sort((a, b) => (consecutive[b.id]-consecutive[a.id]) || (workCount[a.id]-workCount[b.id]));
 
       let assigned = 0;
@@ -244,7 +244,7 @@ function generateSchedule() {
   if (warnings.length > 0) {
     alert('✅ 班表已產生，但以下日期人力不足：\n\n' + warnings.slice(0,15).join('\n') + (warnings.length>15 ? `\n...等共 ${warnings.length} 筆` : ''));
   } else {
-    alert('✅ 班表已自動產生，所有班次均已滿足需求人數！\n（已套用「固定班別」與「連續上班最多5天」規則）');
+    alert('✅ 班表已自動產生，所有班次均已滿足需求人數！\n（規則：未滿連續5天上班者優先排班以減少缺人，滿5天則強制休假）');
   }
 }
 
