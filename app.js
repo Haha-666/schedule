@@ -213,7 +213,7 @@ function generateSchedule() {
 
       // 優先排「連續上班天數較多但未滿5天」的人，盡量撐滿人力以減少缺人；
       // 連續天數相同時，再用工作天數少者優先做平衡
-      avail.sort((a, b) => (workCount[a.id]-workCount[b.id]) || (consecutive[a.id]-consecutive[b.id]));
+      avail.sort((a, b) => (consecutive[a.id]-consecutive[b.id]) || (workCount[a.id]-workCount[b.id]));
 
       let assigned = 0;
       for (const member of avail) {
