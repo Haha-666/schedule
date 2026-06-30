@@ -67,7 +67,7 @@
         <label>中班</label>
         <input id="d-afternoon-wd" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
         <label>晚班</label>
-        <input id="d-evening-wd" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
+        <input id="d-evening-wd" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
         <label>大夜班</label>
         <input id="d-night-wd" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
       </div>
@@ -75,11 +75,11 @@
       <div class="demand-subtitle">🏖️ 假日</div>
       <div class="demand-grid">
         <label>早班</label>
-        <input id="d-morning-we" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
+        <input id="d-morning-we" type="number" min="0" value="3" class="demand-input" onchange="renderAll()" />
         <label>中班</label>
-        <input id="d-afternoon-we" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
+        <input id="d-afternoon-we" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
         <label>晚班</label>
-        <input id="d-evening-we" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
+        <input id="d-evening-we" type="number" min="0" value="3" class="demand-input" onchange="renderAll()" />
         <label>大夜班</label>
         <input id="d-night-we" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
       </div>
@@ -143,6 +143,7 @@
   </div>
 </div>
 
+<script src="scheduler.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

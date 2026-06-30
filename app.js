@@ -1,7 +1,7 @@
 /* =====================================================
-   排班表系統 — app.js  v4  (build: 2026-06-30-fix3)
+   排班表系統 — app.js  v5  (build: 2026-06-30-scheduler)
    ===================================================== */
-const APP_VERSION = 'v4-2026-06-30-fix3';
+const APP_VERSION = 'v5-2026-06-30-scheduler';
 
 // ─── 班別基本設定（時間可由使用者調整）────────────────
 const SHIFT_ORDER = ['morning','afternoon','evening','night']; // 排序：早>中>晚>大夜
@@ -57,12 +57,10 @@ function shiftShortLabel(key) {
 
 // ─── 初始化 ──────────────────────────────────────────
 function init() {
-  _addMember('羽', ['morning']);
-  _addMember('惠', ['morning']);
-  _addMember('孟', ['morning','evening']);
-  _addMember('玲', ['morning','evening']);
-  _addMember('建', ['night']);
-  _addMember('芬', ['evening']);
+  _addMember('王小明', ['morning']);
+  _addMember('李美花', ['morning','evening']);
+  _addMember('張大偉', ['night']);
+  _addMember('陳惠珍', ['evening']);
   viewDate = new Date();
   renderAll();
 }
@@ -174,71 +172,24 @@ function toggleOffDay(dateStr) {
   renderOverview();
 }
 
-// ─── 自動排班（含固定班別限制 + 連續上班最多5天）──────
+// ─── 自動排班（邏輯已抽出至 scheduler.js）──────────────
 function generateSchedule() {
   if (members.length === 0) { alert('請先新增人員'); return; }
 
-  const year   = viewDate.getFullYear();
-  const month  = viewDate.getMonth();
-  const days   = new Date(year, month + 1, 0).getDate();
+  const year  = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const days  = new Date(year, month + 1, 0).getDate();
 
-  // 清除本月非休假排班
-  for (let d = 1; d <= days; d++) {
-    const dateStr = toDateStr(year, month, d);
-    if (!schedule[dateStr]) schedule[dateStr] = {};
-    Object.keys(schedule[dateStr]).forEach(mid => {
-      if (schedule[dateStr][mid] !== 'off') delete schedule[dateStr][mid];
-    });
-  }
-
-  const workCount   = {};   // 累計工作天數（平衡用）
-  const consecutive = {};   // 連續上班天數
-  members.forEach(m => { workCount[m.id] = 0; consecutive[m.id] = 0; });
-
-  for (let d = 1; d <= days; d++) {
-    const dateStr = toDateStr(year, month, d);
-    if (!schedule[dateStr]) schedule[dateStr] = {};
-    const demand = getDemand(isWeekendDate(dateStr));
-
-    for (const shift of SHIFT_ORDER) {
-      const need = demand[shift];
-      if (need === 0) continue;
-
-      const avail = members.filter(m =>
-        !offDays[m.id].has(dateStr) &&
-        schedule[dateStr][m.id] !== 'off' &&
-        !schedule[dateStr][m.id] &&               // 當天尚未被排班
-        canWorkShift(m, shift) &&                  // 符合固定班別限制
-        consecutive[m.id] < 5                       // 未達連續5天上限
-      );
-
-      // 工作天數少者優先（平衡），相同則連續天數少者優先
-      avail.sort((a, b) => (consecutive[a.id]-consecutive[b.id]) || (workCount[a.id]-workCount[b.id]));
-
-      let assigned = 0;
-      for (const member of avail) {
-        if (assigned >= need) break;
-        schedule[dateStr][member.id] = shift;
-        consecutive[member.id]++;
-        workCount[member.id]++;
-        assigned++;
-      }
-    }
-
-    // 更新每人連續上班天數 / 自動排休
-    members.forEach(m => {
-      const sk = schedule[dateStr][m.id];
-      if (sk && sk !== 'off') {
-        consecutive[m.id]++;
-      } else {
-        if (!sk) {
-          // 沒被排到班 → 視為休假（若已連續5天則強制休假提示無影響，因為本來就沒排班）
-          schedule[dateStr][m.id] = 'off';
-        }
-        consecutive[m.id] = 0;
-      }
-    });
-  }
+  runScheduler({
+    members,
+    schedule,
+    offDays,
+    demandFn: (dateStr) => getDemand(isWeekendDate(dateStr)),
+    canWorkShiftFn: canWorkShift,
+    shiftOrder: SHIFT_ORDER,
+    year, month, days,
+    dateStrFn: toDateStr,
+  });
 
   renderAll();
 
@@ -246,7 +197,7 @@ function generateSchedule() {
   if (warnings.length > 0) {
     alert('✅ 班表已產生，但以下日期人力不足：\n\n' + warnings.slice(0,15).join('\n') + (warnings.length>15 ? `\n...等共 ${warnings.length} 筆` : ''));
   } else {
-    alert('✅ 班表已自動產生，所有班次均已滿足需求人數！\n（已套用「固定班別」與「連續上班最多5天」規則）');
+    alert('✅ 班表已自動產生，所有班次均已滿足需求人數！\n（規則：未滿連續5天上班者優先排班以減少缺人，滿5天則強制休假）');
   }
 }
 
