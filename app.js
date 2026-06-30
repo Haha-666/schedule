@@ -57,11 +57,10 @@ function shiftShortLabel(key) {
 
 // ─── 初始化 ──────────────────────────────────────────
 function init() {
-  _addMember('羽', ['morning']);
-  _addMember('玲', ['morning','evening']);
-  _addMember('建', ['night']);
-  _addMember('孟', ['evening']);
-  _addMember('芬', ['evening']);
+  _addMember('王小明', ['morning']);
+  _addMember('李美花', ['morning','evening']);
+  _addMember('張大偉', ['night']);
+  _addMember('陳惠珍', ['evening']);
   viewDate = new Date();
   renderAll();
 }
@@ -211,15 +210,13 @@ function generateSchedule() {
         consecutive[m.id] < 5                       // 未達連續5天上限
       );
 
-      // 優先排「連續上班天數較多但未滿5天」的人，盡量撐滿人力以減少缺人；
-      // 連續天數相同時，再用工作天數少者優先做平衡
-      avail.sort((a, b) => (consecutive[a.id]-consecutive[b.id]) || (workCount[a.id]-workCount[b.id]));
+      // 工作天數少者優先（平衡），相同則連續天數少者優先
+      avail.sort((a, b) => (workCount[a.id]-workCount[b.id]) || (consecutive[a.id]-consecutive[b.id]));
 
       let assigned = 0;
       for (const member of avail) {
         if (assigned >= need) break;
         schedule[dateStr][member.id] = shift;
-        consecutive[member.id]++;
         workCount[member.id]++;
         assigned++;
       }
@@ -246,7 +243,7 @@ function generateSchedule() {
   if (warnings.length > 0) {
     alert('✅ 班表已產生，但以下日期人力不足：\n\n' + warnings.slice(0,15).join('\n') + (warnings.length>15 ? `\n...等共 ${warnings.length} 筆` : ''));
   } else {
-    alert('✅ 班表已自動產生，所有班次均已滿足需求人數！\n（規則：未滿連續5天上班者優先排班以減少缺人，滿5天則強制休假）');
+    alert('✅ 班表已自動產生，所有班次均已滿足需求人數！\n（已套用「固定班別」與「連續上班最多5天」規則）');
   }
 }
 
@@ -578,13 +575,10 @@ function renderOverview() {
       const have = Object.values(dayData).filter(s => s === sk).length;
       if (have < need) msgs.push(`${SHIFTS[sk].label}少${need - have}人`);
     });
-
     if (msgs.length > 0) dayShortage[dateStr] = msgs;
 
-
     const dateLabel = `${month+1}/${d}（${['日','一','二','三','四','五','六'][dow]}）`;
-
-    html += `<tr${isWeekend ? ' class="weekend-row"' : ''}><td class="date-cell>${dateLabel}</td>`;
+    html += `<tr${isWeekend ? ' class="weekend-row"' : ''}><td class="date-cell">${dateLabel}</td>`;
 
     sortedMembers.forEach(m => {
       const sk = dayData[m.id] || '';

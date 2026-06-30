@@ -315,5 +315,4 @@ body { font-family: 'Noto Sans TC', system-ui, sans-serif; background: var(--c-b
   .app { flex-direction: column; }
   .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--c-border); }
   .main { padding: 12px; }
-   
 }
