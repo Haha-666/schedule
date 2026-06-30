@@ -3,10 +3,9 @@
    ===================================================== */
 
 // ─── 班別基本設定（時間可由使用者調整）────────────────
-const SHIFT_ORDER = ['morning','afternoon','evening','night']; // 排序：早>中>晚>大夜
+const SHIFT_ORDER = ['morning','evening','night']; // 排序：早>晚>大夜
 const SHIFTS = {
   morning:   { label: '早班',   cls: 'morning'   },
-  afternoon: { label: '中班',   cls: 'afternoon' },
   evening:   { label: '晚班',   cls: 'evening'   },
   night:     { label: '大夜班', cls: 'night'     },
   off:       { label: '休假',   cls: 'off'       },
@@ -15,7 +14,6 @@ const SHIFTS = {
 // 使用者可調整的班別時間（預設值）
 let shiftTimes = {
   morning:   { start: '07:00', end: '15:00' },
-  afternoon: { start: '15:00', end: '22:00' },
   evening:   { start: '15:00', end: '22:00' },
   night:     { start: '22:00', end: '07:00' },
 };
@@ -25,8 +23,7 @@ const AVATAR_COLORS = [
   '#ef4444','#ec4899','#06b6d4','#84cc16',
 ];
 
-let storeName       = '';
-let members          = [];  // [{ id, name, color, fixedShifts:[] }]  fixedShifts=[] 代表任何班別皆可排
+let members           = [];  // [{ id, name, color, fixedShifts:[] }]  fixedShifts=[] 代表任何班別皆可排
 let schedule          = {}; // { 'YYYY-MM-DD': { memberId: shiftKey } }
 let offDays           = {}; // { memberId: Set<'YYYY-MM-DD'> }
 let viewDate           = new Date();
@@ -47,11 +44,10 @@ function shiftShortLabel(key) {
   if (key === 'off') return '休假';
   const t = shiftTimes[key];
   if (!t) return SHIFTS[key]?.label || key;
-  // "7-15" style — strip leading zero & minutes if :00
+  // 24小時制 "07-15" 樣式（含分鐘則顯示 "07:30-15:00"）
   const fmt = (s) => {
-    let [h, m] = s.split(':');
-    h = String(parseInt(h, 10));
-    return m === '00' ? h : `${h}:${m}`;
+    const [h, m] = s.split(':');
+    return m === '00' ? h.padStart(2, '0') : `${h.padStart(2,'0')}:${m}`;
   };
   return `${fmt(t.start)}-${fmt(t.end)}`;
 }
@@ -61,15 +57,9 @@ function init() {
   _addMember('王小明', ['morning']);
   _addMember('李美花', ['morning','evening']);
   _addMember('張大偉', ['night']);
-  _addMember('陳惠珍', ['afternoon']);
+  _addMember('陳惠珍', ['evening']);
   viewDate = new Date();
   renderAll();
-}
-
-// ─── 店名 ────────────────────────────────────────────
-function renderStoreName() {
-  storeName = document.getElementById('storeName').value.trim();
-  document.getElementById('storeNameDisplay').textContent = storeName ? `🏪 ${storeName}` : '';
 }
 
 // ─── 班別時間設定變更 ─────────────────────────────────
@@ -255,10 +245,9 @@ function generateSchedule() {
 
 function getDemand() {
   return {
-    morning:   parseInt(document.getElementById('d-morning').value)   || 0,
-    afternoon: parseInt(document.getElementById('d-afternoon').value) || 0,
-    evening:   parseInt(document.getElementById('d-evening').value)   || 0,
-    night:     parseInt(document.getElementById('d-night').value)     || 0,
+    morning: parseInt(document.getElementById('d-morning').value) || 0,
+    evening: parseInt(document.getElementById('d-evening').value) || 0,
+    night:   parseInt(document.getElementById('d-night').value)   || 0,
   };
 }
 
@@ -661,7 +650,7 @@ function exportCSV() {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = `${storeName ? storeName + '_' : ''}排班表_${year}_${String(month+1).padStart(2,'0')}.csv`;
+  a.download = `排班表_${year}_${String(month+1).padStart(2,'0')}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }

@@ -13,12 +13,6 @@
   <aside class="sidebar">
     <h1 class="logo">🗓 排班設定</h1>
 
-    <!-- 店名 -->
-    <section class="card">
-      <h2>🏪 店名</h2>
-      <input id="storeName" type="text" placeholder="輸入店名" class="store-input" oninput="renderStoreName()" />
-    </section>
-
     <!-- 班別時間設定 -->
     <section class="card">
       <h2>⏰ 班別時間設定</h2>
@@ -27,11 +21,6 @@
         <input type="time" id="t-morning-start" value="07:00" onchange="onShiftTimeChange()" />
         <span>–</span>
         <input type="time" id="t-morning-end" value="15:00" onchange="onShiftTimeChange()" />
-
-        <span class="shift-dot afternoon"></span><label>中班</label>
-        <input type="time" id="t-afternoon-start" value="15:00" onchange="onShiftTimeChange()" />
-        <span>–</span>
-        <input type="time" id="t-afternoon-end" value="22:00" onchange="onShiftTimeChange()" />
 
         <span class="shift-dot evening"></span><label>晚班</label>
         <input type="time" id="t-evening-start" value="15:00" onchange="onShiftTimeChange()" />
@@ -56,7 +45,6 @@
       <div class="new-member-shifts">
         <span class="hint" style="display:block;margin-bottom:4px">固定上班班別（不選=任何班別皆可排）：</span>
         <label><input type="checkbox" class="new-member-shift" value="morning"> 早班</label>
-        <label><input type="checkbox" class="new-member-shift" value="afternoon"> 中班</label>
         <label><input type="checkbox" class="new-member-shift" value="evening"> 晚班</label>
         <label><input type="checkbox" class="new-member-shift" value="night"> 大夜班</label>
       </div>
@@ -68,10 +56,8 @@
       <div class="demand-grid">
         <label>早班</label>
         <input id="d-morning" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
-        <label>中班</label>
-        <input id="d-afternoon" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
         <label>晚班</label>
-        <input id="d-evening" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
+        <input id="d-evening" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
         <label>大夜班</label>
         <input id="d-night" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
       </div>
@@ -92,7 +78,6 @@
   <!-- ===== 右側主畫面 ===== -->
   <main class="main">
     <div class="topbar">
-      <span id="storeNameDisplay" class="store-name-display"></span>
       <button class="nav-btn" onclick="changeMonth(-1)">&#8249;</button>
       <span id="monthLabel" class="month-label"></span>
       <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
