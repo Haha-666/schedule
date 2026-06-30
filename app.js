@@ -1,6 +1,7 @@
 /* =====================================================
-   排班表系統 — app.js  v3
+   排班表系統 — app.js  v4  (build: 2026-06-30-fix3)
    ===================================================== */
+const APP_VERSION = 'v4-2026-06-30-fix3';
 
 // ─── 班別基本設定（時間可由使用者調整）────────────────
 const SHIFT_ORDER = ['morning','afternoon','evening','night']; // 排序：早>中>晚>大夜
@@ -675,11 +676,44 @@ function toDateStr(y, m, d) {
   return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 }
 function renderAll() {
-  renderLegend();
-  renderSidebar();
-  renderCalendar();
-  renderOverview();
+  try {
+    renderLegend();
+    renderSidebar();
+    renderCalendar();
+    renderOverview();
+    renderVersionBadge();
+  } catch (err) {
+    showFatalError(err);
+  }
+}
+
+function renderVersionBadge() {
+  let badge = document.getElementById('versionBadge');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.id = 'versionBadge';
+    badge.style.cssText = 'position:fixed;bottom:6px;right:8px;font-size:10px;color:#9ca3af;font-family:monospace;z-index:50;background:rgba(255,255,255,.8);padding:2px 6px;border-radius:4px';
+    document.body.appendChild(badge);
+  }
+  badge.textContent = APP_VERSION;
+}
+
+// 若任何渲染步驟出錯，直接在頁面上顯示錯誤訊息（不再讓畫面整片空白看不出原因）
+function showFatalError(err) {
+  console.error('排班表發生錯誤：', err);
+  let box = document.getElementById('fatalErrorBox');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'fatalErrorBox';
+    box.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#fee2e2;color:#991b1b;padding:14px 20px;font-size:13px;font-family:monospace;z-index:9999;white-space:pre-wrap;border-bottom:2px solid #ef4444;max-height:40vh;overflow:auto';
+    document.body.prepend(box);
+  }
+  box.textContent = '⚠️ 程式發生錯誤，請截圖此訊息回報：\n' + (err && err.stack ? err.stack : String(err));
 }
 
 // ─── 啟動 ─────────────────────────────────────────────
-init();
+try {
+  init();
+} catch (err) {
+  showFatalError(err);
+}
