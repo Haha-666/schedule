@@ -57,10 +57,12 @@ function shiftShortLabel(key) {
 
 // ─── 初始化 ──────────────────────────────────────────
 function init() {
-  _addMember('王小明', ['morning']);
-  _addMember('李美花', ['morning','evening']);
-  _addMember('張大偉', ['night']);
-  _addMember('陳惠珍', ['evening']);
+  _addMember('羽', ['morning']);
+  _addMember('惠', ['morning']);
+  _addMember('孟', ['morning','evening']);
+  _addMember('玲', ['morning','evening']);
+  _addMember('建', ['night']);
+  _addMember('芬', ['evening']);
   viewDate = new Date();
   renderAll();
 }
@@ -211,12 +213,13 @@ function generateSchedule() {
       );
 
       // 工作天數少者優先（平衡），相同則連續天數少者優先
-      avail.sort((a, b) => (workCount[a.id]-workCount[b.id]) || (consecutive[a.id]-consecutive[b.id]));
+      avail.sort((a, b) => (consecutive[a.id]-consecutive[b.id]) || (workCount[a.id]-workCount[b.id]));
 
       let assigned = 0;
       for (const member of avail) {
         if (assigned >= need) break;
         schedule[dateStr][member.id] = shift;
+        consecutive[member.id]++;
         workCount[member.id]++;
         assigned++;
       }
