@@ -581,10 +581,10 @@ function renderOverview() {
 
     if (msgs.length > 0) dayShortage[dateStr] = msgs;
 
-    const hasShortage = msge.length > 0;
+
     const dateLabel = `${month+1}/${d}（${['日','一','二','三','四','五','六'][dow]}）`;
-    let rowClass = isWeekend ? ' class="weekend-row"' : '';
-    html += `<tr${isWeekend ? ' class="weekend-row"' : ''}><td class="date-cell ${hasShortage ? 'date-shortage-cell' : ''}">${dateLabel}</td>`;
+
+    html += `<tr${isWeekend ? ' class="weekend-row"' : ''}><td class="date-cell>${dateLabel}</td>`;
 
     sortedMembers.forEach(m => {
       const sk = dayData[m.id] || '';
