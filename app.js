@@ -578,10 +578,13 @@ function renderOverview() {
       const have = Object.values(dayData).filter(s => s === sk).length;
       if (have < need) msgs.push(`${SHIFTS[sk].label}少${need - have}人`);
     });
+
     if (msgs.length > 0) dayShortage[dateStr] = msgs;
 
+    const hasShortage = msge.length > 0;
     const dateLabel = `${month+1}/${d}（${['日','一','二','三','四','五','六'][dow]}）`;
-    html += `<tr${isWeekend ? ' class="weekend-row"' : ''}><td class="date-cell">${dateLabel}</td>`;
+    let rowClass = isWeekend ? ' class="weekend-row"' : '';
+    html += `<tr${isWeekend ? ' class="weekend-row"' : ''}><td class="date-cell ${hasShortage ? 'date-shortage-cell' : ''}">${dateLabel}</td>`;
 
     sortedMembers.forEach(m => {
       const sk = dayData[m.id] || '';
