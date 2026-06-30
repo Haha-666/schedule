@@ -3,9 +3,10 @@
    ===================================================== */
 
 // ─── 班別基本設定（時間可由使用者調整）────────────────
-const SHIFT_ORDER = ['morning','evening','night']; // 排序：早>晚>大夜
+const SHIFT_ORDER = ['morning','afternoon','evening','night']; // 排序：早>中>晚>大夜
 const SHIFTS = {
   morning:   { label: '早班',   cls: 'morning'   },
+  afternoon: { label: '中班',   cls: 'afternoon' },
   evening:   { label: '晚班',   cls: 'evening'   },
   night:     { label: '大夜班', cls: 'night'     },
   off:       { label: '休假',   cls: 'off'       },
@@ -14,6 +15,7 @@ const SHIFTS = {
 // 使用者可調整的班別時間（預設值）
 let shiftTimes = {
   morning:   { start: '07:00', end: '15:00' },
+  afternoon: { start: '10:00', end: '18:00' },
   evening:   { start: '15:00', end: '22:00' },
   night:     { start: '22:00', end: '07:00' },
 };
@@ -175,7 +177,6 @@ function generateSchedule() {
   const year   = viewDate.getFullYear();
   const month  = viewDate.getMonth();
   const days   = new Date(year, month + 1, 0).getDate();
-  const demand = getDemand();
 
   // 清除本月非休假排班
   for (let d = 1; d <= days; d++) {
@@ -193,6 +194,7 @@ function generateSchedule() {
   for (let d = 1; d <= days; d++) {
     const dateStr = toDateStr(year, month, d);
     if (!schedule[dateStr]) schedule[dateStr] = {};
+    const demand = getDemand(isWeekendDate(dateStr));
 
     for (const shift of SHIFT_ORDER) {
       const need = demand[shift];
@@ -243,24 +245,31 @@ function generateSchedule() {
   }
 }
 
-function getDemand() {
+function getDemand(isWeekend) {
+  const suffix = isWeekend ? 'we' : 'wd';
   return {
-    morning: parseInt(document.getElementById('d-morning').value) || 0,
-    evening: parseInt(document.getElementById('d-evening').value) || 0,
-    night:   parseInt(document.getElementById('d-night').value)   || 0,
+    morning:   parseInt(document.getElementById(`d-morning-${suffix}`).value)   || 0,
+    afternoon: parseInt(document.getElementById(`d-afternoon-${suffix}`).value) || 0,
+    evening:   parseInt(document.getElementById(`d-evening-${suffix}`).value)   || 0,
+    night:     parseInt(document.getElementById(`d-night-${suffix}`).value)     || 0,
   };
+}
+
+function isWeekendDate(dateStr) {
+  const dow = new Date(dateStr + 'T00:00:00').getDay();
+  return dow === 0 || dow === 6;
 }
 
 function checkDemand() {
   const year   = viewDate.getFullYear();
   const month  = viewDate.getMonth();
   const days   = new Date(year, month + 1, 0).getDate();
-  const demand = getDemand();
   const warnings = [];
 
   for (let d = 1; d <= days; d++) {
     const dateStr = toDateStr(year, month, d);
     const dayData = schedule[dateStr] || {};
+    const demand  = getDemand(isWeekendDate(dateStr));
     const msgs = [];
     for (const shift of SHIFT_ORDER) {
       const need = demand[shift];
@@ -436,7 +445,6 @@ function renderCalendar() {
   const cal      = document.getElementById('calendar');
   const today    = new Date();
   const todayStr = toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
-  const demand   = getDemand();
 
   cal.innerHTML = '';
   ['日','一','二','三','四','五','六'].forEach(d => {
@@ -457,6 +465,7 @@ function renderCalendar() {
   for (let d = 1; d <= totalDays; d++) {
     const dateStr = toDateStr(year, month, d);
     const dow     = new Date(year, month, d).getDay();
+    const demand  = getDemand(dow === 0 || dow === 6);
     const cell    = document.createElement('div');
     cell.className = 'cal-cell' + (dateStr === todayStr ? ' today' : '');
     cell.addEventListener('click', () => onCellClick(dateStr));
@@ -528,7 +537,6 @@ function renderOverview() {
   const year   = viewDate.getFullYear();
   const month  = viewDate.getMonth();
   const days   = new Date(year, month + 1, 0).getDate();
-  const demand = getDemand();
 
   const sortedMembers = sortMembersByFixedShift(members);
   const memberHours = {};
@@ -551,6 +559,7 @@ function renderOverview() {
     const dow     = new Date(year, month, d).getDay();
     const dayData = schedule[dateStr] || {};
     const isWeekend = dow === 0 || dow === 6;
+    const demand  = getDemand(isWeekend);
 
     // 檢查不足
     const msgs = [];
@@ -607,7 +616,6 @@ function exportCSV() {
   const year  = viewDate.getFullYear();
   const month = viewDate.getMonth();
   const days  = new Date(year, month + 1, 0).getDate();
-  const demand = getDemand();
 
   const sortedMembers = sortMembersByFixedShift(members);
 
@@ -621,7 +629,9 @@ function exportCSV() {
   for (let d = 1; d <= days; d++) {
     const dateStr = toDateStr(year, month, d);
     const dayData = schedule[dateStr] || {};
-    const dow = ['日','一','二','三','四','五','六'][new Date(year, month, d).getDay()];
+    const dowNum = new Date(year, month, d).getDay();
+    const dow = ['日','一','二','三','四','五','六'][dowNum];
+    const demand = getDemand(dowNum === 0 || dowNum === 6);
     const cols = sortedMembers.map(m => {
       const sk = dayData[m.id] || '';
       if (sk && sk !== 'off') memberHours[m.id] += shiftHours(sk);

@@ -22,6 +22,11 @@
         <span>–</span>
         <input type="time" id="t-morning-end" value="15:00" onchange="onShiftTimeChange()" />
 
+        <span class="shift-dot afternoon"></span><label>中班</label>
+        <input type="time" id="t-afternoon-start" value="10:00" onchange="onShiftTimeChange()" />
+        <span>–</span>
+        <input type="time" id="t-afternoon-end" value="18:00" onchange="onShiftTimeChange()" />
+
         <span class="shift-dot evening"></span><label>晚班</label>
         <input type="time" id="t-evening-start" value="15:00" onchange="onShiftTimeChange()" />
         <span>–</span>
@@ -45,6 +50,7 @@
       <div class="new-member-shifts">
         <span class="hint" style="display:block;margin-bottom:4px">固定上班班別（不選=任何班別皆可排）：</span>
         <label><input type="checkbox" class="new-member-shift" value="morning"> 早班</label>
+        <label><input type="checkbox" class="new-member-shift" value="afternoon"> 中班</label>
         <label><input type="checkbox" class="new-member-shift" value="evening"> 晚班</label>
         <label><input type="checkbox" class="new-member-shift" value="night"> 大夜班</label>
       </div>
@@ -53,13 +59,29 @@
     <!-- 每班需求人數 -->
     <section class="card">
       <h2>🔢 每班需求人數</h2>
+
+      <div class="demand-subtitle">📅 平日</div>
       <div class="demand-grid">
         <label>早班</label>
-        <input id="d-morning" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
+        <input id="d-morning-wd" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
+        <label>中班</label>
+        <input id="d-afternoon-wd" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
         <label>晚班</label>
-        <input id="d-evening" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
+        <input id="d-evening-wd" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
         <label>大夜班</label>
-        <input id="d-night" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
+        <input id="d-night-wd" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
+      </div>
+
+      <div class="demand-subtitle">🏖️ 假日</div>
+      <div class="demand-grid">
+        <label>早班</label>
+        <input id="d-morning-we" type="number" min="0" value="3" class="demand-input" onchange="renderAll()" />
+        <label>中班</label>
+        <input id="d-afternoon-we" type="number" min="0" value="2" class="demand-input" onchange="renderAll()" />
+        <label>晚班</label>
+        <input id="d-evening-we" type="number" min="0" value="3" class="demand-input" onchange="renderAll()" />
+        <label>大夜班</label>
+        <input id="d-night-we" type="number" min="0" value="1" class="demand-input" onchange="renderAll()" />
       </div>
     </section>
 
