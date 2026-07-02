@@ -2,7 +2,7 @@
    排班表系統 — app.js  v6  (build: 2026-07-01)
    6班制：早1/早2/中/晚1/晚2/大夜
    ===================================================== */
-const APP_VERSION = 'v6-2026-07-01';
+const APP_VERSION = 'v7-2026-07-02';
 
 // ─── 班別設定 ──────────────────────────────────────────
 const SHIFT_ORDER = ['morning','morning2','afternoon','evening','evening2','night'];
@@ -124,7 +124,9 @@ function addMember() {
   const name  = input.value.trim();
   if (!name) { input.focus(); return; }
   if (members.find(m => m.name === name)) { alert('已有同名人員'); return; }
-  const fixedShifts = Array.from(document.querySelectorAll('.new-member-shift:checked')).map(c => c.value);
+  const checked = Array.from(document.querySelectorAll('.new-member-shift:checked'));
+  if (checked.length > 2) { alert('固定班別最多只能選 2 個'); return; }
+  const fixedShifts = checked.map(c => c.value);
   _addMember(name, fixedShifts);
   input.value = '';
   document.querySelectorAll('.new-member-shift').forEach(c => { c.checked = false; });
@@ -147,21 +149,46 @@ function editMemberShifts(id) {
   document.getElementById('editMemberName').textContent = m.name;
   document.getElementById('editMemberId').value = id;
   document.getElementById('editShiftChecks').innerHTML = SHIFT_ORDER.map(k =>
-    `<label><input type="checkbox" value="${k}" ${m.fixedShifts.includes(k)?'checked':''}> ${SHIFTS[k].label}（${shiftShortLabel(k)}）</label>`
+    `<label><input type="checkbox" value="${k}" ${m.fixedShifts.includes(k)?'checked':''}
+      onchange="limitEditShiftChecks(this)"> ${SHIFTS[k].label}（${shiftShortLabel(k)}）</label>`
   ).join('');
+  // 初始化 disabled 狀態
+  const allCbs = Array.from(document.querySelectorAll('#editShiftChecks input[type=checkbox]'));
+  if (m.fixedShifts.length >= 2) {
+    allCbs.forEach(c => { if (!c.checked) c.disabled = true; });
+  }
+  const hint = document.getElementById('editShiftChecks').parentElement.querySelector('.edit-max-hint');
   document.getElementById('editMemberModal').classList.remove('hidden');
 }
 function saveEditMember() {
-  const id = document.getElementById('editMemberId').value;
-  const m  = members.find(m => m.id === id);
+  const id      = document.getElementById('editMemberId').value;
+  const m       = members.find(m => m.id === id);
   if (!m) return;
-  m.fixedShifts = Array.from(document.querySelectorAll('#editShiftChecks input:checked')).map(c => c.value);
+  const selected = Array.from(document.querySelectorAll('#editShiftChecks input:checked')).map(c => c.value);
+  if (selected.length > 2) { alert('固定班別最多只能選 2 個'); return; }
+  m.fixedShifts = selected;
   Object.keys(schedule).forEach(date => {
     const sk = schedule[date][id];
     if (sk && sk !== 'off' && m.fixedShifts.length && !m.fixedShifts.includes(sk)) delete schedule[date][id];
   });
   document.getElementById('editMemberModal').classList.add('hidden');
   renderAll();
+}
+// 限制固定班別最多勾 2 個，超過時自動 disable 其餘未勾選項目
+function limitShiftChecks(changed, groupClass) {
+  const all     = Array.from(document.querySelectorAll('.' + groupClass));
+  const checked = all.filter(c => c.checked);
+  all.forEach(c => {
+    if (!c.checked) c.disabled = checked.length >= 2;
+  });
+}
+// 同名版給 edit modal（不同 class 名稱）
+function limitEditShiftChecks(changed) {
+  const all     = Array.from(document.querySelectorAll('#editShiftChecks input[type=checkbox]'));
+  const checked = all.filter(c => c.checked);
+  all.forEach(c => {
+    if (!c.checked) c.disabled = checked.length >= 2;
+  });
 }
 function selectMember(id) {
   activeMemberId = activeMemberId === id ? null : id;
@@ -492,10 +519,10 @@ function renderOverview() {
     const isWE     = dow===0 || dow===6;
     const isShort  = shortageSet.has(dateStr);
     const dowLabel = ['日','一','二','三','四','五','六'][dow];
-    const rowCls   = isShort ? 'shortage-row' : (isWE ? 'weekend-row' : '');
+    const rowCls   = isWE ? 'weekend-row' : '';
 
     html += `<tr${rowCls ? ` class="${rowCls}"` : ''}>`;
-    html += `<td class="date-cell">${month+1}/${d}（${dowLabel}）</td>`;
+    html += `<td class="date-cell${isShort ? ' shortage-date' : ''}">${month+1}/${d}（${dowLabel}）</td>`;
 
     sorted.forEach(m => {
       const sk = dayData[m.id] || '';

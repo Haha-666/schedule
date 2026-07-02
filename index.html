@@ -59,13 +59,13 @@
         <button onclick="addMember()">新增</button>
       </div>
       <div class="new-member-shifts">
-        <span class="hint" style="display:block;margin-bottom:4px">固定上班班別（不選=任何班別皆可排）：</span>
-        <label><input type="checkbox" class="new-member-shift" value="morning">  早班1</label>
-        <label><input type="checkbox" class="new-member-shift" value="morning2"> 早班2</label>
-        <label><input type="checkbox" class="new-member-shift" value="afternoon">中班</label>
-        <label><input type="checkbox" class="new-member-shift" value="evening">  晚班1</label>
-        <label><input type="checkbox" class="new-member-shift" value="evening2"> 晚班2</label>
-        <label><input type="checkbox" class="new-member-shift" value="night">    大夜班</label>
+        <span class="hint" style="display:block;margin-bottom:4px">固定上班班別（最多選 2 個，不選=任何班別皆可排）：</span>
+        <label><input type="checkbox" class="new-member-shift" value="morning"   onchange="limitShiftChecks(this,'new-member-shift')"> 早班1</label>
+        <label><input type="checkbox" class="new-member-shift" value="morning2"  onchange="limitShiftChecks(this,'new-member-shift')"> 早班2</label>
+        <label><input type="checkbox" class="new-member-shift" value="afternoon" onchange="limitShiftChecks(this,'new-member-shift')">中班</label>
+        <label><input type="checkbox" class="new-member-shift" value="evening"   onchange="limitShiftChecks(this,'new-member-shift')"> 晚班1</label>
+        <label><input type="checkbox" class="new-member-shift" value="evening2"  onchange="limitShiftChecks(this,'new-member-shift')"> 晚班2</label>
+        <label><input type="checkbox" class="new-member-shift" value="night"     onchange="limitShiftChecks(this,'new-member-shift')"> 大夜班</label>
       </div>
     </section>
 
@@ -144,7 +144,7 @@
     <h3>設定「<span id="editMemberName"></span>」固定班別</h3>
     <input type="hidden" id="editMemberId" />
     <div id="editShiftChecks" class="edit-shift-checks"></div>
-    <p class="hint" style="margin-top:8px">不勾選任何項目 = 任何班別皆可排。</p>
+    <p class="hint" style="margin-top:8px">最多選 2 個班別。不勾選 = 任何班別皆可排。</p>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="close-btn" style="background:#f3f4f6" onclick="document.getElementById('editMemberModal').classList.add('hidden')">取消</button>
       <button class="close-btn" style="background:#4f7bf7;color:#fff" onclick="saveEditMember()">儲存</button>

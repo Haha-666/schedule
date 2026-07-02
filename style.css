@@ -288,13 +288,19 @@ body {
 .overview-table .weekend-row td { background: #fafafa; }
 .overview-table .total-row td   { background: #f0f4ff; font-weight: 700; }
 
-/* shortage-row: 整列反紅 */
-.overview-table tr.shortage-row td {
+/* 人力不足：只有日期格反紅 */
+.overview-table td.shortage-date {
   background: #fee2e2 !important;
-  color: #991b1b;
-}
-.overview-table tr.shortage-row .date-cell {
+  color: #991b1b !important;
   font-weight: 700;
+}
+@media print {
+  .overview-table td.shortage-date {
+    background: #fecaca !important;
+    color: #991b1b !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 
 .overview-table td.morning   { background: #dbeafe; color: var(--c-morning);   font-weight: 600; }
@@ -369,58 +375,68 @@ body {
    Print  — A4 橫式列印
 =========================== */
 @media print {
-  @page { size: A4 landscape; margin: 10mm; }
+  @page { size: A4 landscape; margin: 8mm 10mm; }
 
-  body { background: #fff; font-size: 10px; }
+  body { background: #fff; }
 
-  /* 隱藏側邊欄、日曆、月份導覽、圖例、版本標籤 */
-  .sidebar,
-  .topbar,
-  .legend,
-  .cal-wrap,
-  .shortage-box,
-  .overview-title,
-  #versionBadge { display: none !important; }
+  /* 隱藏不需要的元素 */
+  .sidebar, .topbar, .legend, .cal-wrap,
+  .shortage-box, #versionBadge { display: none !important; }
 
-  /* 主區只顯示總覽表格 */
-  .app { display: block; }
+  .app  { display: block; }
   .main { padding: 0; gap: 0; }
-  .overview-wrap {
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
+
+  .overview-wrap { border: none !important; border-radius: 0 !important; }
+  .overview-title { font-size: 12px; font-weight: 700; padding: 0 0 6px; border: none; }
   .overview-scroll { overflow: visible; }
 
-  /* 讓表格撐滿整頁且不換行 */
+  /* table-layout:fixed → 每欄等寬，不因內容撐開 */
   .overview-table {
     width: 100%;
     table-layout: fixed;
-    font-size: 8px;
+    font-size: 7px;
     border-collapse: collapse;
     page-break-inside: avoid;
   }
+
+  /* 日期欄固定寬度 */
+  .overview-table th:first-child,
+  .overview-table td:first-child {
+    width: 48px;
+    min-width: 48px;
+    max-width: 48px;
+    text-align: left;
+  }
+
+  /* 其餘欄（人名 & 班別）自動等分剩餘寬度 */
   .overview-table th,
   .overview-table td {
-    padding: 2px 3px;
-    border: 0.5px solid #888 !important;
-    white-space: nowrap;
+    padding: 2px 2px;
+    border: 0.4px solid #999 !important;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
   }
-  /* 在列印時保留背景色（shortage 反紅） */
-  .overview-table tr.shortage-row td {
-    background: #fecaca !important;
+
+  /* 人名標題列 */
+  .overview-table thead th {
+    background: #e8e8e8 !important;
+    font-size: 7px;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  /* 保留所有班別與缺班背景色 */
   .overview-table td.morning,
   .overview-table td.morning2,
   .overview-table td.afternoon,
   .overview-table td.evening,
   .overview-table td.evening2,
   .overview-table td.night,
-  .overview-table td.off {
+  .overview-table td.off,
+  .overview-table td.shortage-date {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
